@@ -22,6 +22,27 @@ class Pokemon(Dataset):
             self.name2label[name] = len(self.name2label.keys())
             
         print(self.name2label)
+        
+    def load_csv(self, filename):
+        images = []
+        for name in self.name2label:
+            # 'pokeman/{label}/000001.png'
+            images += glob.glob(os.path.join(self.root, name, '*.png'))
+            images += glob.glob(os.path.join(self.root, name, '*.jpg'))
+            images += glob.glob(os.path.join(self.root, name, '*.jpeg'))
+        
+        # 1165 ['pokeman/bulbasaur/00000158.png'
+        print(len(images), images)
+        random.shuffle(images)
+        with open(os.path.join(self.root, filename), mode='w', newline='') as f:
+            writer = csv.writer(f)
+            for img in images:
+                name = img.split(os.sep)[-2]
+                label = self.name2label[name]
+                writer.writerow([img, label])
+            print('write into csv file', filename)
+            
+        
 
     def __len__(self):
         pass
@@ -32,6 +53,7 @@ class Pokemon(Dataset):
 
 def main():
     db = Pokemon("pokeman", 224, 'train')
+    db.load_csv('images.csv')
     
     
 if __name__ == "__main__":
